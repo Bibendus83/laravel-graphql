@@ -3,6 +3,70 @@
 
 return [
 
+    // The prefix for routes
+    'prefix' => 'graphql',
+
+    // The routes to make GraphQL request. Either a string that will apply
+    // to both query and mutation or an array containing the key 'query' and/or
+    // 'mutation' with the according Route
+    //
+    // Example:
+    //
+    // Same route for both query and mutation
+    //
+    // 'routes' => 'path/to/query/{graphql_schema?}',
+    //
+    // or define each routes
+    //
+    // 'routes' => [
+    //     'query' => 'query/{graphql_schema?}',
+    //     'mutation' => 'mutation/{graphql_schema?}',
+    //     'mutation' => 'graphiql'
+    // ]
+    //
+    // you can also disable routes by setting routes to null
+    //
+    // 'routes' => null,
+    //
+    'routes' => '{graphql_schema?}',
+
+    // The controller to use in GraphQL request. Either a string that will apply
+    // to both query and mutation or an array containing the key 'query' and/or
+    // 'mutation' with the according Controller and method
+    //
+    // Example:
+    //
+    // 'controllers' => [
+    //     'query' => '\Folklore\GraphQL\GraphQLController@query',
+    //     'mutation' => '\Folklore\GraphQL\GraphQLController@mutation'
+    // ]
+    //
+    'controllers' => \Folklore\GraphQL\GraphQLController::class.'@query',
+
+    // The name of the input that contain variables when you query the endpoint.
+    // Most library use "variables", you can change it here in case you need it.
+    // In previous versions, the default used to be "params"
+    'variables_input_name' => 'variables',
+
+    // Any middleware for the graphql route group
+    'middleware' => [],
+
+    // Any headers that will be added to the response returned by the default controller
+    'headers' => [],
+
+    // Any json encoding options when returning a response from the default controller
+    // See http://php.net/manual/function.json-encode.php for list of options
+    'json_encoding_options' => 0,
+
+    // Config for GraphiQL (https://github.com/graphql/graphiql).
+    // To disable GraphiQL, set this to null.
+    'graphiql' => [
+        'routes' => '/graphiql/{graphql_schema?}',
+        'controller' => \Folklore\GraphQL\GraphQLController::class.'@graphiql',
+        'middleware' => [],
+        'view' => 'graphql::graphiql'
+    ],
+
     // The name of the default schema used when no argument is provided
     // to GraphQL::schema() or when the routes are used without the {graphql_schema}
     // parameter.
@@ -73,50 +137,13 @@ return [
 
     ],
 
-    // The prefix for routes. You can remove it by setting it to null.
-    'routes_prefix' => 'graphql',
 
-    // The routes to make GraphQL request. By default, both query and mutation
-    // are set to {graphql_schema?} so you can make requests to /graphql or
-    // /graphql/name_of_the_schema
-    //
-    // You can define other routes, like this:
-    //
-    // 'routes' => [
-    //     'query' => 'other_query/{graphql_schema?}',
-    //     'mutation' => 'mutation/{graphql_schema?}'
-    // ]
-    //
-    // Or disable routes by setting routes to null
-    //
-    // 'routes' => null,
-    //
-    'routes' => [
-        'query' => '{graphql_schema?}',
-        'mutation' => '{graphql_schema?}'
-    ],
 
-    // The controller to use in GraphQL request. It expect an array containing
-    // the key 'query' and/or 'mutation' with the according Controller path
-    //
-    // Example:
-    //
-    // 'controllers' => [
-    //     'query' => '\Folklore\GraphQL\GraphQLController@query',
-    //     'mutation' => '\Folklore\GraphQL\GraphQLController@mutation'
-    // ]
-    //
-    'controllers' => [
-        'query' => '\Folklore\GraphQL\GraphQLController@query',
-        'mutation' => '\Folklore\GraphQL\GraphQLController@query'
-    ],
-    
-    // The name of the input that will contains variables when you query the endpoint.
-    // Some library use "variables", you can change it here.
-    'request_variables_name' => 'variables',
 
-    // Any middleware for the graphql routes group
-    'middleware' => [],
+
+
+
+
 
     // This callable will received every Error objects for each errors GraphQL catch.
     // The method should return an array representing the error.
@@ -161,20 +188,15 @@ return [
         ]
     ],
     
-    // Config for GraphiQL (https://github.com/graphql/graphiql).
-    // To disable GraphiQL, set this to null.
-    'graphiql' => [
-        'routes' => '/graphiql',
-        'middleware' => [],
-        'view' => 'graphql::graphiql',
-        'composer' => \Folklore\GraphQL\View\GraphiQLComposer::class
-    ],
+
+
 
     // Options to limit the query complexity and depth. See the doc
     // @ https://github.com/webonyx/graphql-php#security
     // for details. Disabled by default.
     'security' => [
         'query_max_complexity' => null,
-        'query_max_depth' => null
+        'query_max_depth' => null,
+        'disable_introspection' => false
     ]
 ];

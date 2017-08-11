@@ -1,6 +1,9 @@
 # Advanced Usage
 
 - [Query variables](#query-variables)
+- [Query nested resource](#query-nested-resource)
+- [Enums](#enums)
+- [Interfaces](#interfaces)
 - [Custom field](#custom-field)
 - [Eager loading relationships](#eager-loading-relationships)
 
@@ -22,6 +25,173 @@ When you query the GraphQL endpoint, you can pass a `variables` parameter.
 ```
 http://homestead.app/graphql?query=query+FetchUserByID($id:String){user(id:$id){id,email}}&variables={"id":"1"}
 ```
+
+### Query nested resource
+
+If you want to query nested resource like that :
+
+```
+query FetchUser{
+    user(id: 123456789) {
+        id
+        posts(id: 987654321) {
+            id
+        }
+    }
+}
+```
+
+you need to add post field and implement resolveField method in UserType:
+
+```
+public function fields()
+{
+    return [
+        'id' => [
+            'type'        => Type::nonNull(Type::string()),
+            'description' => 'Id of user',
+        ],
+        'posts' => [
+            'args' => [
+                'id' => [
+                    'type'        => Type::string(),
+                    'description' => 'id of the post',
+                ],
+            ],
+            'type'        => Type::listOf(GraphQL::type('Post')),
+            'description' => 'post description',
+        ],
+    ];
+}
+    
+public function resolvePostsField($root, $args)
+{
+    if (isset($args['id'])) {
+        return  $root->posts->where('id', $args['id']);
+    }
+
+    return $root->posts;
+}
+```
+
+### Enums
+
+Enumeration types are a special kind of scalar that is restricted to a particular set of allowed values.
+Read more about Enums [here](http://graphql.org/learn/schema/#enumeration-types)
+
+```php
+<?php
+// app/GraphQL/Enums/EpisodeEnum.php
+namespace App\GraphQL\Enums;
+
+use Folklore\GraphQL\Support\Type as GraphQLType;
+
+class EpisodeEnum extends GraphQLType {
+    protected $enumObject = true;
+
+    protected $attributes = [
+        'name' => 'Episode',
+        'description' => 'The types of demographic elements',
+        'values' => [
+            'NEWHOPE' => 'NEWHOPE',
+            'EMPIRE' => 'EMPIRE',
+            'JEDI' => 'JEDI',
+        ],
+    ];
+}
+
+```
+
+### Interfaces
+
+You can use interfaces to abstract a set of fields. Read more about interfaces [here](http://graphql.org/learn/schema/#interfaces).
+
+An implementation of an interface:
+
+```php
+<?php
+// app/GraphQL/Interfaces/CharacterInterface.php
+namespace App\GraphQL\Interfaces;
+
+use GraphQL;
+use Folklore\GraphQL\Support\InterfaceType;
+use GraphQL\Type\Definition\Type;
+
+class CharacterInterface extends InterfaceType {
+    protected $attributes = [
+            'name' => 'Character',
+            'description' => 'Character interface.',
+        ];
+    
+        public function fields() {
+            return [
+                'id' => [
+                    'type' => Type::nonNull(Type::int()),
+                    'description' => 'The id of the character.'
+                ],
+                'appearsIn' => [
+                    'type' => Type::nonNull(Type::listOf(GraphQL::type('Episode'))),
+                    'description' => 'A list of episodes in which the character has an appearance.'
+                ],
+            ];
+        }
+    
+        public function resolveType($root) {
+            // Use the resolveType to resolve the Type which is implemented trough this interface
+            $type = $root['type'];
+            if ($type === 'human') {
+                return GraphQL::type('Human');
+            } else if  ($type === 'droid') {
+                return GraphQL::type('Droid');
+            }
+        }
+}
+```
+
+A Type that implements an interface:
+
+```php
+<?php
+// app/GraphQL/Types/HumanType.php
+namespace App\GraphQL\Types;
+
+use GraphQL;
+use Folklore\GraphQL\Support\Type as GraphQLType;
+use GraphQL\Type\Definition\Type;
+
+class HumanType extends GraphQLType {
+
+    protected $attributes = [
+        'name' => 'Human',
+        'description' => 'A human.'
+    ];
+
+    public function fields() {
+        return [
+            'id' => [
+                'type' => Type::nonNull(Type::int()),
+                'description' => 'The id of the human.',
+            ],
+            'appearsIn' => [
+                'type' => Type::nonNull(Type::listOf(GraphQL::type('Episode'))),
+                'description' => 'A list of episodes in which the human has an appearance.'
+            ],
+            'totalCredits' => [
+                'type' => Type::nonNull(Type::int()),
+                'description' => 'The total amount of credits this human owns.'
+            ]
+        ];
+    }
+
+    public function interfaces() {
+        return [
+            GraphQL::type('Character')
+        ];
+    }
+}
+
+```
+
 
 ### Custom field
 

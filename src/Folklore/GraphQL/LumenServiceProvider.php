@@ -13,7 +13,7 @@ class LumenServiceProvider extends ServiceProvider
     {
         return $this->app;
     }
-
+    
     /**
      * Bootstrap any application services.
      *
@@ -22,16 +22,16 @@ class LumenServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->bootPublishes();
-
+        
         $this->bootTypes();
-
+        
         $this->bootSchemas();
-
+        
         $this->bootRouter();
-
+        
         $this->bootViews();
     }
-
+    
     /**
      * Bootstrap publishes
      *
@@ -46,31 +46,29 @@ class LumenServiceProvider extends ServiceProvider
     }
 
     /**
-     * Bootstrap router
+     * Register facade
      *
      * @return void
      */
-    protected function bootRouter()
+    public function registerGraphQL()
     {
-        $router = $this->getRouter();
-
-        // Define routes
-        if ($this->app['config']->get('graphql.routes')) {
-            include __DIR__.'/routes.php';
+        static $registred = false;
+        // Check if facades are activated
+        if (Facade::getFacadeApplication() == $this->app && !$registred) {
+            class_alias(\Folklore\GraphQL\Support\Facades\GraphQL::class, 'GraphQL');
+            $registred = true;
         }
+
+        parent::registerGraphQL();
     }
 
     /**
      * Register the helper command to publish the config file
      */
-    public function registerCommands()
+    public function registerConsole()
     {
-        parent::registerCommands();
-
-        $this->app->singleton('command.graphql.publish', function ($app) {
-            return new \Folklore\GraphQL\Console\PublishCommand($app['files']);
-        });
-
-        $this->commands('command.graphql.publish');
+        parent::registerConsole();
+        
+        $this->commands(\Folklore\GraphQL\Console\PublishCommand::class);
     }
 }
