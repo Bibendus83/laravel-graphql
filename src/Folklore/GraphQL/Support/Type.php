@@ -20,12 +20,12 @@ class Type extends Fluent
         return [];
     }
     
-    public function fields()
+    protected function fields()
     {
         return [];
     }
     
-    public function interfaces()
+    protected function interfaces()
     {
         return [];
     }
