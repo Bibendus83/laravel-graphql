@@ -1,3 +1,8 @@
+# Fork changes
+
+This fork has *master@1.0.19* merged in *relay* branch.
+The rest of this readme is not updated. It has the content of the readme in the master branch but all relay documentation is missing and should be included.
+
 # Laravel GraphQL
 
 Use Facebook GraphQL with Laravel 5 or Lumen. It is based on the PHP implementation [here](https://github.com/webonyx/graphql-php). You can find more information about GraphQL in the [GraphQL Introduction](http://facebook.github.io/react/blog/2015/05/01/graphql-introduction.html) on the [React](http://facebook.github.io/react) blog or you can read the [GraphQL specifications](https://facebook.github.io/graphql/). This is a work in progress.

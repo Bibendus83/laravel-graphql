@@ -2,7 +2,8 @@
 
 use GraphQL\GraphQL as GraphQLBase;
 use GraphQL\Schema;
-use GraphQL\Error;
+use GraphQL\Error\Error;
+
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Validator\DocumentValidator;
 
@@ -45,6 +46,7 @@ class GraphQL
         // Get values from the schema
         $schemaQuery = array_get($schema, 'query', []);
         $schemaMutation = array_get($schema, 'mutation', []);
+        $schemaSubscription = array_get($schema, 'subscription', []);
         $schemaTypes = array_get($schema, 'types', []);
 
         // Clear the cache of type instance
@@ -75,10 +77,15 @@ class GraphQL
         $mutation = $this->objectType($schemaMutation, [
             'name' => 'Mutation'
         ]);
-
+        
+        $subscription = $this->objectType($schemaSubscription, [
+            'name' => 'Subscription'
+        ]);
+        
         return new Schema([
             'query' => $query,
-            'mutation' => $mutation,
+            'mutation' => !empty($schemaMutation) ? $mutation : null,
+            'subscription' => !empty($schemaSubscription) ? $subscription : null,
             'types' => $types
         ]);
     }
@@ -126,11 +133,11 @@ class GraphQL
 
         return $objectType;
     }
-
-    public function query($query, $params = [], $opts = [])
+    
+    public function query($query, $variables = [], $opts = [])
     {
-        $result = $this->queryAndReturnResult($query, $params, $opts);
-
+        $result = $this->queryAndReturnResult($query, $variables, $opts);
+        
         if (!empty($result->errors)) {
             $errorFormatter = config('graphql.error_formatter', [self::class, 'formatError']);
 
@@ -144,8 +151,8 @@ class GraphQL
             ];
         }
     }
-
-    public function queryAndReturnResult($query, $params = [], $opts = [])
+    
+    public function queryAndReturnResult($query, $variables = [], $opts = [])
     {
         $root = array_get($opts, 'root', null);
         $context = array_get($opts, 'context', null);
@@ -153,9 +160,9 @@ class GraphQL
         $operationName = array_get($opts, 'operationName', null);
 
         $schema = $this->schema($schemaName);
-
-        $result = GraphQLBase::executeAndReturnResult($schema, $query, $root, $context, $params, $operationName);
-
+        
+        $result = GraphQLBase::executeAndReturnResult($schema, $query, $root, $context, $variables, $operationName);
+        
         return $result;
     }
 
