@@ -141,45 +141,6 @@ return [
 
     ],
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // The controller to use in GraphQL request. It expect an array containing
-    // the key 'query' and/or 'mutation' with the according Controller path
-    //
-    // Example:
-    //
-    // 'controllers' => [
-    //     'query' => '\Folklore\GraphQL\GraphQLController@query',
-    //     'mutation' => '\Folklore\GraphQL\GraphQLController@mutation'
-    // ]
-    //
-    'controllers' => [
-        'query' => '\Folklore\GraphQL\GraphQLController@query',
-        'mutation' => '\Folklore\GraphQL\GraphQLController@query'
-    ],
-    
-
     // This callable will received every Error objects for each errors GraphQL catch.
     // The method should return an array representing the error.
     //
