@@ -1,5 +1,7 @@
 <?php namespace Folklore\GraphQL;
 
+										
+												 
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
 
 class ServiceProvider extends BaseServiceProvider
@@ -21,6 +23,8 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function boot()
     {
+        $this->bootEvents();
+
         $this->bootPublishes();
 
         $this->bootSchemas();
@@ -32,7 +36,46 @@ class ServiceProvider extends BaseServiceProvider
         $this->bootRouter();
 
         $this->bootViews();
+		
+							  
     }
+
+    /**
+     * Bootstrap router
+     *
+     * @return void
+     */
+    protected function bootRouter()
+    {
+        $router = $this->getRouter();
+        $graphql = $this->app['graphql'];
+
+        //Update the schema route pattern when schema is added
+        $this->app['events']->listen(\Folklore\GraphQL\Events\SchemaAdded::class, function () use ($graphql, $router) {
+            $router->pattern('graphql_schema', $graphql->routerSchemaPattern());
+        });
+
+        $router->pattern('graphql_schema', $graphql->routerSchemaPattern());
+
+        // Define routes
+        if ($this->app['config']->get('graphql.routes')) {
+            include __DIR__.'/routes.php';
+        }
+    }
+
+    /**
+     * Bootstrap events
+     *
+     * @return void
+     */
+    protected function bootEvents()
+    {
+		// NON EXISTENT
+																							   
+																		   
+																																			 
+		   
+	}
 
     /**
      * Bootstrap publishes
@@ -63,26 +106,36 @@ class ServiceProvider extends BaseServiceProvider
     }
 
     /**
-     * Bootstrap router
+     * Add types to GraphQL
      *
      * @return void
      */
-    protected function bootRouter()
+    protected function bootTypes()
     {
-        $router = $this->getRouter();
-        $graphql = $this->app['graphql'];
+        $configTypes = $this->app['config']->get('graphql.types', []);
+												  
+									
+													  
+					
+        $this->app['graphql']->addTypes($configTypes);
+																		 
+																						 
+		 
+    }
 
-        //Update the schema route pattern when schema is added
-        $this->app['events']->listen(\Folklore\GraphQL\Events\SchemaAdded::class, function () use ($graphql, $router) {
-            $router->pattern('graphql_schema', $graphql->routerSchemaPattern());
-        });
-
-        $router->pattern('graphql_schema', $graphql->routerSchemaPattern());
-
-        // Define routes
-        if ($this->app['config']->get('graphql.routes')) {
-            include __DIR__.'/routes.php';
-        }
+    /**
+     * Add schemas to GraphQL
+     *
+     * @return void
+     */
+    protected function bootSchemas()
+    {
+        $this->app['graphql']->addSchemas($this->app['config']->get('graphql.schemas', []));
+													  
+        $this->app['graphql']->setDefaultSchema($this->app['config']->get('graphql.schema', 'default'));
+																		 
+																						 
+		 
     }
 
     /**
@@ -102,28 +155,6 @@ class ServiceProvider extends BaseServiceProvider
     }
 
     /**
-     * Add schemas to GraphQL
-     *
-     * @return void
-     */
-    protected function bootSchemas()
-    {
-        $this->app['graphql']->addSchemas($this->app['config']->get('graphql.schemas', []));
-        $this->app['graphql']->setDefaultSchema($this->app['config']->get('graphql.schema', 'default'));
-    }
-
-    /**
-     * Add types to GraphQL
-     *
-     * @return void
-     */
-    protected function bootTypes()
-    {
-        $configTypes = $this->app['config']->get('graphql.types', []);
-        $this->app['graphql']->addTypes($configTypes);
-    }
-
-    /**
      * Set security options
      *
      * @return void
@@ -134,10 +165,21 @@ class ServiceProvider extends BaseServiceProvider
         $maxQueryComplexity = $config->get('graphql.security.query_max_complexity');
         $maxQueryDepth = $config->get('graphql.security.query_max_depth');
         if ($maxQueryComplexity !== null) {
+																			 
             $this->app['graphql']->setMaxQueryComplexity($maxQueryComplexity);
         }
+
+																	
         if ($maxQueryDepth !== null) {
+																   
             $this->app['graphql']->setMaxQueryDepth($maxQueryDepth);
+		 
+
+																				 
+											 
+																					   
+																						   
+																			 
         }
     }
 
