@@ -71,10 +71,6 @@ class ServiceProvider extends BaseServiceProvider
     protected function bootEvents()
     {
 		// NON EXISTENT
-																							   
-																		   
-																																			 
-		   
 	}
 
     /**
@@ -114,13 +110,7 @@ class ServiceProvider extends BaseServiceProvider
     {
         $configTypes = $this->app['config']->get('graphql.types', []);
 												  
-									
-													  
-					
         $this->app['graphql']->addTypes($configTypes);
-																		 
-																						 
-		 
     }
 
     /**
@@ -131,11 +121,7 @@ class ServiceProvider extends BaseServiceProvider
     protected function bootSchemas()
     {
         $this->app['graphql']->addSchemas($this->app['config']->get('graphql.schemas', []));
-													  
         $this->app['graphql']->setDefaultSchema($this->app['config']->get('graphql.schema', 'default'));
-																		 
-																						 
-		 
     }
 
     /**
@@ -173,13 +159,6 @@ class ServiceProvider extends BaseServiceProvider
         if ($maxQueryDepth !== null) {
 																   
             $this->app['graphql']->setMaxQueryDepth($maxQueryDepth);
-		 
-
-																				 
-											 
-																					   
-																						   
-																			 
         }
     }
 
