@@ -14,7 +14,6 @@ class Type extends Fluent
 {
     protected static $instances = [];
     
-    protected $inputObject = false;
     protected $enumObject = false;
     
     public function attributes()
@@ -135,9 +134,6 @@ class Type extends Fluent
 
     public function toType()
     {
-        if ($this->inputObject) {
-            return new InputObjectType($this->toArray());
-        }
         if ($this->enumObject) {
             return new EnumType($this->toArray());
         }
