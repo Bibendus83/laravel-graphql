@@ -8,7 +8,6 @@ use Illuminate\Support\Fluent;
 use Folklore\GraphQL\Support\Field;
 
 use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 
 class Type extends Fluent
